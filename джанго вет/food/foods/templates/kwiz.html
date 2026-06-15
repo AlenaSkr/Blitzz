@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Квиз | Blitz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #f5f2eb;
+      --text-main: #1a1a1a;
+      --text-muted: #6b6b6b;
+
+      --btn-green: #a8c96c;
+      --btn-green-hover: #96b85a;
+      --card-green: #c5d8a8;
+      --footer-bg: #1a1a1a;
+      --border: #d4d0c8;
+      --radius: 8px;
+      font-family: "Oswald", "Arial", sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      color: var(--text-main);
+      background: var(--bg-page);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { text-decoration: none; color: inherit; transition: opacity 0.2s; }
+    a:hover { opacity: 0.8; }
+    ul { list-style: none; }
+    img { max-width: 100%; display: block; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+    /* ===== HEADER ===== */
+    .header { background: transparent; padding: 20px 0; font-family: "Oswald", "Arial", sans-serif; }
+    .header .container { display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-size: 22px; font-weight: 900; color: #fff; background: var(--logo-red); padding: 4px 10px; border-radius: 4px; letter-spacing: 0.5px; }
+    .main-nav { display: flex; align-items: center; gap: 22px; }
+    .main-nav a { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--logo-red); letter-spacing: 0.3px; }
+
+    /* ===== MAIN QUIZ ===== */
+    .quiz-section { flex: 1; padding: 30px 0 60px; }
+    .quiz-section .container { display: flex; flex-direction: column; align-items: flex-start; }
+    .breadcrumb { font-size: 12px; color: #999; margin-bottom: 28px; }
+    .breadcrumb span { color: var(--text-main); font-weight: 500; }
+    .quiz-title { font-size: 42px; font-weight: 900; margin-bottom: 8px; letter-spacing: -0.5px; }
+    .quiz-subtitle { font-size: 17px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 36px; }
+
+    /* Progress Bar - RIGHT ALIGNED with CIRCLES */
+    .progress-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: 40px;
+      width: 100%;
+    }
+    /* Кружки с цифрами */
+    .progress-num { 
+      width: 34px; 
+      height: 34px; 
+      border-radius: 50%; 
+      background: #d4d0c8; /* Цвет неактивного кружка */
+      color: #6b6b6b;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .progress-num.active { 
+      background: var(--text-main); 
+      color: #fff; 
+      transform: scale(1.1);
+    }
+    
+    .progress-dots { display: flex; gap: 6px; align-items: center; flex: 0 1 200px; }
+    .dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border); transition: all 0.3s; }
+    .dot.active { background: var(--text-main); height: 6px; }
+    .dot.completed { background: #8cc63f; }
+
+    /* Quiz Content */
+    #quiz-content { width: 100%; margin-bottom: 32px; }
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .quiz-card {
+      background: var(--card-green); border-radius: 16px; height: 260px; position: relative;
+      display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden;
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .quiz-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+    .quiz-card.selected { outline: 3px solid var(--text-main); outline-offset: -3px; }
+    .card-img { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); font-size: 90px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15)); pointer-events: none; }
+    .card-btn { position: relative; z-index: 2; background: var(--text-main); color: #fff; padding: 12px; text-align: center; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; }
+
+    /* Options Grid */
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 540px; }
+    .options-grid.full-width { max-width: 100%; grid-template-columns: 1fr; }
+    .checkbox-item { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; font-weight: 500; color: var(--text-main); padding: 4px 0; }
+    .checkbox-item input { display: none; }
+    .custom-checkbox { width: 18px; height: 18px; border: 2px solid #888; border-radius: 3px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+    .checkbox-item input:checked + .custom-checkbox { background: var(--text-main); border-color: var(--text-main); }
+    .custom-checkbox::after { content: '✓'; color: #fff; font-size: 11px; font-weight: 700; opacity: 0; transform: scale(0); transition: all 0.2s; }
+    .checkbox-item input:checked + .custom-checkbox::after { opacity: 1; transform: scale(1); }
+    .option-long { grid-column: 1 / -1; font-size: 14px; line-height: 1.5; padding: 8px 0; }
+
+    /* Inputs */
+    .select-row { display: flex; gap: 16px; flex-wrap: wrap; max-width: 400px; }
+    .select-group { flex: 1; min-width: 140px; }
+    .select-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+    .select-group select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; background: #fff; appearance: none; cursor: pointer; }
+    .weight-control { display: flex; align-items: center; gap: 12px; background: #fff; padding: 8px 16px; border-radius: var(--radius); border: 1px solid var(--border); width: fit-content; }
+    .weight-btn { width: 32px; height: 32px; border: none; background: transparent; font-size: 18px; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; }
+    .weight-btn:hover { background: #f0f0f0; border-radius: 4px; }
+    .weight-input { width: 80px; border: none; text-align: center; font-size: 16px; font-weight: 600; background: transparent; }
+    .weight-input:focus { outline: none; }
+    .unit-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+
+    /* Controls */
+    .btn-group { display: flex; gap: 12px; }
+    .btn { padding: 12px 28px; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
+    .btn-back { background: var(--btn-green); color: var(--text-main); }
+    .btn-back:hover { background: var(--btn-green-hover); }
+    .btn-next { background: var(--btn-green); color: var(--text-main); }
+    .btn-next:hover { background: var(--btn-green-hover); }
+    .btn:disabled { background: #d4d0c8; color: #999; cursor: not-allowed; }
+
+    /* ===== RESULTS VIEW (Carousel) ===== */
+    #results-view { display: none; width: 100%; animation: fadeIn 0.5s ease; margin-top: 20px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .results-header { text-align: center; margin-bottom: 30px; }
+    .results-header h2 { font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-main); }
+
+    /* Carousel Container */
+    .carousel-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .carousel-arrow {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      color: var(--text-main);
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .carousel-arrow:hover { opacity: 0.6; }
+
+    .products-track {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* Product Card */
+    .product-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
+    
+    .wishlist-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: #d1d1d1;
+    }
+    .wishlist-btn:hover { color: var(--logo-red); }
+
+    .product-img {
+      width: 100%;
+      height: 160px;
+      background: #f8f8f8;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      color: #ccc;
+    }
+
+    .product-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 4px;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 56px;
+    }
+    
+    .product-weight {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+
+    .btn-cart {
+      width: 100%;
+      background: var(--text-main);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+    .btn-cart:hover { background: #333; }
+
+    .btn-buy-one-click {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 12px;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .btn-buy-one-click:hover { color: var(--text-main); }
+
+    /* ===== FOOTER ===== */
+    .footer { background: var(--footer-bg); color: var(--text-muted); padding: 40px 0 24px; margin-top: auto; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 32px; }
+    .footer-col h3 { color: #fff; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 14px; letter-spacing: 1px; }
+    .footer-col a { display: block; font-size: 12px; color: #888; margin-bottom: 8px; }
+    .footer-col a:hover { color: #fff; }
+    .footer-requisites { font-size: 11px; color: #666; line-height: 1.7; }
+    .footer-requisites strong { color: #888; }
+    .footer-phone { font-size: 15px; color: #fff; font-weight: 700; margin-bottom: 8px; }
+    .footer-socials { display: flex; gap: 8px; margin-top: 8px; }
+    .footer-socials a { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: #333; color: #fff; border-radius: 4px; font-size: 12px; }
+    .footer-bottom { border-top: 1px solid #333; padding-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-copyright { font-size: 11px; color: #666; }
+    .footer-logo { font-size: 20px; font-weight: 900; color: #fff; background: var(--logo-red); padding: 3px 8px; border-radius: 4px; }
+
+    @media (max-width: 900px) {
+      .container { padding: 0 20px; }
+      .main-nav { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .quiz-title { font-size: 32px; }
+      .cards-grid, .options-grid { grid-template-columns: 1fr; }
+      .quiz-card { height: 200px; }
+      .products-track { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      .products-track { grid-template-columns: 1fr; }
+      .carousel-arrow { display: none; } /* Скрываем стрелки на мобильных, так как можно скроллить пальцем */
+      .products-track { overflow-x: auto; }
+    }
+        .h3 {
+  font-family: "Oswald", "Arial", sans-serif;
+  text-transform: uppercase;
+  color: #b22222;
+  position: relative;
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="container">
+      <a href="re.html" class="logo">
+    <img src="Logo2.png" alt="Blitz Logo">
+      </a>
+      <nav class="main-nav">
+      <a href="#"><h3>Каталог</h3></a>
+      <a href="razdel.html"><h3>Ветеринарная линейка</h3></a>
+      <a href="#"><h3>Где купить</h3></a>
+      <a href="#"><h3>Сотрудничество </h3></a>
+      <a href="brend.html"><h3>О бренде</h3></a>
+      <a href="#"><h3>Контакты</h3></a>
+      <a href="#"><h3>Важно знать </h3></a>
+      <a href="#" class="account-link"><h3>👤 Личный кабинет</h3></a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- QUIZ -->
+  <main class="quiz-section">
+    <div class="container">
+      <div class="breadcrumb"><a href="re.html">Главная</a> / <span>Квиз</span></div>
+      <h1 class="quiz-title">КВИЗ</h1>
+      <h2 class="quiz-subtitle" id="question-text">ВЫБЕРИТЕ ТИП ЖИВОТНЫХ</h2>
+
+      <div class="progress-wrapper">
+        <span class="progress-num active" id="current-step">1</span>
+        <div class="progress-dots" id="progress-dots"></div>
+        <span class="progress-num" id="total-step">10</span>
+      </div>
+
+      <!-- Quiz Content -->
+      <div id="quiz-content"></div>
+
+      <!-- Results Content (Hidden by default) -->
+      <div id="results-view">
+        <div class="results-header">
+          <h2>ВАМ ПОДОЙДЕТ СЛЕДУЮЩАЯ ПРОДУКЦИЯ</h2>
+        </div>
+        
+        <div class="carousel-container">
+          <button class="carousel-arrow" id="prev-slide">‹</button>
+          <div class="products-track" id="products-grid"></div>
+          <button class="carousel-arrow" id="next-slide">›</button>
+        </div>
+
+        <div class="btn-group" style="justify-content:center; margin-top: 30px;">
+          
+        </div>
+      </div>
+
+      <div class="btn-group" id="nav-buttons">
+        <button class="btn btn-back" id="btn-back" disabled>НАЗАД</button>
+        <button class="btn btn-next" id="btn-next" disabled>ДАЛЕЕ</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h3>Реквизиты</h3>
+          <div class="footer-requisites">
+            <p><strong>Общество с ограниченной ответственностью «Компания АКАНА»</strong></p>
+            <p>141031, Московская область, г. Мытищи, Осташковское шоссе, вл.5, стр.1, каб.301</p>
+            <p>ИНН 7716679918 ОГРН 1117746027300</p>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h3>Каталог</h3>
+          <a href="razdel.html">Ветеринарная линейка</a>
+          <a href="#">Рецепты</a>
+          <a href="#">Диетарная</a>
+        </div>
+        <div class="footer-col">
+          <h3>Где купить</h3>
+          <a href="brend.html">О бренде</a>
+          <a href="#">Документация</a>
+          <a href="#">Важно знать</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-phone">8-499-213-0646</div>
+          <div class="footer-socials">
+            <a href="#">VK</a>
+            <a href="#">TG</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copyright">©2024 Blitz. Все права защищены.</span>
+        <div class="footer-logo">Blitz</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Данные квиза
+    const quizSteps = [
+      { id: 1, type: 'cards', question: "ВЫБЕРИТЕ ТИП ЖИВОТНЫХ", options: ["КОШКИ", "СОБАКИ"], icons: ["🐱", ""] },
+      { id: 2, type: 'radio', question: "ВЫБЕРИТЕ ПОЛ ЖИВОТНОГО", options: ["Мужской", "Женский"] },
+      { id: 3, type: 'checkbox', question: "ВЫБЕРИТЕ ПОДХОДЯЩИЕ ТИПЫ БЕЛКА", options: ["Курица", "Утка", "Индейка", "Баранина", "Кролик", "Говядина"] },
+      { id: 4, type: 'radio', question: "ВЫБЕРИТЕ ТИП КОРМА", options: ["Сухой", "Влажный"] },
+      { id: 5, type: 'radio', question: "СТЕРИЛИЗОВАН ЛИ ВАШ ПИТОМЕЦ?", options: ["Да", "Нет"] },
+      { id: 6, type: 'age', question: "УКАЖИТЕ ВОЗРАСТ ПИТОМЦА" },
+      { id: 7, type: 'radio', question: "УКАЖИТЕ ИНФОРМАЦИЮ О БЕРЕМЕННОСТИ", options: ["Не беременная", "Беременная", "Кормящая"] },
+      { id: 8, type: 'weight', question: "УКАЖИТЕ ВЕС ПИТОМЦА" },
+      { id: 9, type: 'radio', question: "УКАЖИТЕ ПОКАЗАНИЯ К ПРИМЕНЕНИЮ", options: [
+        "GASTROINTESTINAL: показана при остром и хроническом гастроэнтерите, колитах, запорах, нарушении всасывания, диарее, панкреатите, экзокринной недостаточности поджелудочной железы.",
+        "HEPATIC: при нарушении функции печени, способствующая нормализации ее работы.",
+        "RENAL: при хронической почечной недостаточности, способствующий замедлению прогрессирования ХПН.",
+        "HYPOALLERGENIC: показана при пищевой аллергии и атопическом дерматите."
+      ]},
+      { id: 10, type: 'submit', question: "ГОТОВО К РАСЧЕТУ" }
+    ];
+
+    const TOTAL_STEPS = quizSteps.length;
+    let currentStepIndex = 0;
+    let userAnswers = {};
+
+    const container = document.getElementById('quiz-content');
+    const resultsView = document.getElementById('results-view');
+    const productsGrid = document.getElementById('products-grid');
+    const questionEl = document.getElementById('question-text');
+    const currentStepEl = document.getElementById('current-step');
+    const totalStepEl = document.getElementById('total-step');
+    const progressDots = document.getElementById('progress-dots');
+    const btnBack = document.getElementById('btn-back');
+    const btnNext = document.getElementById('btn-next');
+    const navButtons = document.getElementById('nav-buttons');
+
+    // Инициализация прогресса (10 кружков)
+    function initProgress() {
+      progressDots.innerHTML = '';
+      for(let i=0; i<TOTAL_STEPS-1; i++) { // 9 точек между 1 и 10
+        const d = document.createElement('div');
+        d.className = 'dot';
+        if(i < currentStepIndex) d.classList.add('completed');
+        if(i === currentStepIndex) d.classList.add('active');
+        progressDots.appendChild(d);
+      }
+    }
+
+    function renderStep() {
+      const step = quizSteps[currentStepIndex];
+      currentStepEl.textContent = currentStepIndex + 1;
+      questionEl.textContent = step.question;
+      container.innerHTML = '';
+      btnNext.disabled = true;
+      btnNext.textContent = currentStepIndex === TOTAL_STEPS - 1 ? 'ПОЛУЧИТЬ РЕЗУЛЬТАТ' : 'ДАЛЕЕ';
+
+      // Cards
+      if(step.type === 'cards') {
+        container.className = 'cards-grid';
+        step.options.forEach((opt, i) => {
+          const card = document.createElement('div');
+          card.className = 'quiz-card';
+          if(userAnswers[step.id] === opt) { card.classList.add('selected'); btnNext.disabled = false; }
+          card.innerHTML = `<div class="card-img">${step.icons[i]}</div><div class="card-btn">${opt} ›</div>`;
+          card.onclick = () => {
+            document.querySelectorAll('.quiz-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            userAnswers[step.id] = opt;
+            btnNext.disabled = false;
+          };
+          container.appendChild(card);
+        });
+      }
+      // Radio
+      else if(step.type === 'radio') {
+        container.className = step.options[0].length > 50 ? 'options-grid full-width' : 'options-grid';
+        step.options.forEach(opt => {
+          const item = document.createElement('label');
+          item.className = 'checkbox-item';
+          if(opt.length > 50) item.classList.add('option-long');
+          item.innerHTML = `<input type="radio" name="step-${step.id}" value="${opt}"><span class="custom-checkbox"></span>${opt}`;
+          container.appendChild(item);
+          item.querySelector('input').addEventListener('change', (e) => {
+            userAnswers[step.id] = e.target.value;
+            btnNext.disabled = false;
+          });
+          if(userAnswers[step.id] === opt) { item.querySelector('input').checked = true; btnNext.disabled = false; }
+        });
+      }
+      // Checkbox (Multi-select)
+      else if(step.type === 'checkbox') {
+        container.className = 'options-grid';
+        userAnswers[step.id] = userAnswers[step.id] || [];
+        step.options.forEach(opt => {
+          const item = document.createElement('label');
+          item.className = 'checkbox-item';
+          item.innerHTML = `<input type="checkbox" name="step-${step.id}" value="${opt}"><span class="custom-checkbox"></span>${opt}`;
+          container.appendChild(item);
+          
+          const cb = item.querySelector('input');
+          if(userAnswers[step.id].includes(opt)) cb.checked = true;
+          
+          cb.addEventListener('change', () => {
+            if(cb.checked) {
+              if(!userAnswers[step.id].includes(opt)) userAnswers[step.id].push(opt);
+            } else {
+              userAnswers[step.id] = userAnswers[step.id].filter(v => v !== opt);
+            }
+            btnNext.disabled = userAnswers[step.id].length === 0;
+          });
+        });
+        if(userAnswers[step.id].length > 0) btnNext.disabled = false;
+      }
+      // Age
+      else if(step.type === 'age') {
+        container.className = '';
+        const months = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+        const saved = userAnswers[step.id] || { year: 2023, month: 'Сентябрь' };
+        container.innerHTML = `<div class="select-row"><div class="select-group"><label>Год рождения</label><select id="age-year"></select></div><div class="select-group"><label>Месяц рождения</label><select id="age-month"></select></div></div>`;
+        const ySel = document.getElementById('age-year');
+        const mSel = document.getElementById('age-month');
+        const now = new Date();
+        for(let y=now.getFullYear(); y>=2015; y--) { const o=document.createElement('option'); o.value=y; o.textContent=y; if(y==saved.year) o.selected=true; ySel.appendChild(o); }
+        months.forEach(m => { const o=document.createElement('option'); o.value=m; o.textContent=m; if(m==saved.month) o.selected=true; mSel.appendChild(o); });
+        const saveAge = () => { userAnswers[step.id] = { year: ySel.value, month: mSel.value }; btnNext.disabled = false; };
+        ySel.onchange = saveAge; mSel.onchange = saveAge;
+        if(userAnswers[step.id]) btnNext.disabled = false;
+      }
+      // Weight
+      else if(step.type === 'weight') {
+        container.className = '';
+        const saved = userAnswers[step.id] || 2500;
+        container.innerHTML = `<div class="weight-control"><button class="weight-btn" id="w-minus">−</button><input type="number" class="weight-input" id="w-input" value="${saved}" min="100" step="100"><button class="weight-btn" id="w-plus">+</button></div><span class="unit-label">грамм</span>`;
+        const inp = document.getElementById('w-input');
+        const saveW = () => { if(inp.value > 0) { userAnswers[step.id] = parseInt(inp.value); btnNext.disabled = false; } else btnNext.disabled = true; };
+        document.getElementById('w-minus').onclick = () => { inp.value = Math.max(100, parseInt(inp.value)-100); saveW(); };
+        document.getElementById('w-plus').onclick = () => { inp.value = parseInt(inp.value)+100; saveW(); };
+        inp.oninput = saveW;
+        if(userAnswers[step.id]) btnNext.disabled = false;
+      }
+      // Submit
+      else if(step.type === 'submit') {
+        container.className = '';
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); line-height:1.6; max-width:500px; margin:0 auto;">Все данные успешно введены. Нажмите кнопку «Получить результат».</div>`;
+        btnNext.disabled = false;
+      }
+
+      btnBack.disabled = currentStepIndex === 0;
+      initProgress();
+    }
+
+    // Формирование рекомендаций
+    function getRecommendations() {
+      // Моковая база данных для демонстрации
+      const productsDB = [
+        { name: "Blitz Sensitive с индейкой и рисом (супер-премиум корм для взрослых собак всех пород)", weight: "1.5 кг", price: "1 020.00 ₽", img: "" },
+        { name: "Blitz Optimal Adult с ягненком (сбалансированный рацион для повседневного питания)", weight: "1.5 кг", price: "1 020.00 ₽", img: "🐕" },
+        { name: "Blitz Indoor для стерилизованных кошек (контроль веса и мочевыводящих путей)", weight: "1.5 кг", price: "1 020.00 ₽", img: "🐈" },
+        { name: "Blitz Renal Support (лечебная диета при заболеваниях почек)", weight: "1.5 кг", price: "1 020.00 ₽", img: "🐕" },
+        { name: "Blitz Hypoallergenic (для собак с пищевой аллергией)", weight: "1.5 кг", price: "1 020.00 ₽", img: "" }
+      ];
+
+      // Простая фильтрация на основе выбора животного (для демо)
+      const animal = userAnswers[1] || "Собаки";
+      let filtered = productsDB.filter(p => animal.includes("Кошки") ? p.img === "🐈" : p.img === "🐕");
+      
+      // Если товаров мало, добавляем остальные для полноты карусели
+      if(filtered.length < 4) {
+        filtered = [...filtered, ...productsDB.slice(0, 4 - filtered.length)];
+      }
+      return filtered.slice(0, 4);
+    }
+
+    function showResults() {
+      const products = getRecommendations();
+      productsGrid.innerHTML = '';
+      
+      products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <button class="wishlist-btn"></button>
+          <div class="product-img">${p.img}</div>
+          <div class="product-title">${p.name}</div>
+          <div class="product-weight">Вес: ${p.weight}</div>
+          <div class="product-price">${p.price}</div>
+          <button class="btn-cart">В корзину 🛒</button>
+          <button class="btn-buy-one-click">купить в один клик</button>
+        `;
+        productsGrid.appendChild(card);
+      });
+
+      container.style.display = 'none';
+      navButtons.style.display = 'none';
+      resultsView.style.display = 'block';
+      questionEl.textContent = 'РЕЗУЛЬТАТЫ ПОДБОРА';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function restartQuiz() {
+      currentStepIndex = 0;
+      userAnswers = {};
+      resultsView.style.display = 'none';
+      container.style.display = 'block';
+      navButtons.style.display = 'flex';
+      questionEl.textContent = quizSteps[0].question;
+      renderStep();
+    }
+
+    // Навигация
+    btnNext.addEventListener('click', () => {
+      if(btnNext.disabled) return;
+      if(currentStepIndex < TOTAL_STEPS - 1) {
+        currentStepIndex++;
+        renderStep();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        showResults();
+      }
+    });
+
+    btnBack.addEventListener('click', () => {
+      if(currentStepIndex > 0) {
+        currentStepIndex--;
+        renderStep();
+      }
+    });
+
+    // Логика стрелок карусели
+    document.getElementById('next-slide').onclick = () => {
+      productsGrid.scrollBy({ left: 300, behavior: 'smooth' });
+    };
+    document.getElementById('prev-slide').onclick = () => {
+      productsGrid.scrollBy({ left: -300, behavior: 'smooth' });
+    };
+
+    // Init
+    renderStep();
+  </script>
+</body>
+</html>

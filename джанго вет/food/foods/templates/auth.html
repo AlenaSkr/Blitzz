@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Авторизация — Blitz{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===== AUTH OVERLAY ===== */
+  .auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ===== AUTH MODAL ===== */
+  .auth-modal {
+    background: #f5f2eb;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+    animation: modalSlideIn 0.3s ease;
+  }
+
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Close button */
+  .auth-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+  .auth-close:hover { color: var(--text-main); }
+
+  /* Title */
+  .auth-title {
+    font-family: var(--font);
+    font-size: 22px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-main);
+    text-align: center;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+  }
+
+  /* Login method tabs */
+  .auth-tabs {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .auth-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-muted);
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+  }
+  .auth-tab:hover { color: var(--text-main); }
+  .auth-tab.active { color: var(--text-main); font-weight: 600; }
+  
+  .auth-tab .radio-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .auth-tab.active .radio-circle {
+    border-color: var(--text-main);
+  }
+  .auth-tab .radio-circle::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text-main);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .auth-tab.active .radio-circle::after {
+    opacity: 1;
+  }
+
+  /* Subtitle */
+  .auth-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* Form */
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .auth-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    background: #fff;
+    color: var(--text-main);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .auth-input:focus {
+    outline: none;
+    border-color: var(--btn-green);
+    box-shadow: 0 0 0 3px rgba(168, 201, 108, 0.2);
+  }
+  .auth-input::placeholder {
+    color: #bbb;
+  }
+
+  /* Login button */
+  .auth-submit {
+    width: 100%;
+    padding: 14px;
+    background: #c5d8a8;
+    color: var(--text-main);
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 24px;
+  }
+  .auth-submit:hover {
+    background: #b2c896;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .auth-submit:active {
+    transform: translateY(0);
+  }
+
+  /* Divider */
+  .auth-divider {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .auth-divider::before,
+  .auth-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 70px);
+    height: 1px;
+    background: #ddd;
+  }
+  .auth-divider::before { left: 0; }
+  .auth-divider::after { right: 0; }
+
+  /* Social buttons */
+  .auth-socials {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .auth-social-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .auth-social-btn.yandex {
+    background: #FC3F1D;
+  }
+  .auth-social-btn.vk {
+    background: #0077FF;
+  }
+  .auth-social-btn.google {
+    background: #4285F4;
+  }
+  .auth-social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  /* Bottom links */
+  .auth-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .auth-link {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .auth-link:hover { color: var(--text-main); }
+  .auth-link.register {
+    font-weight: 600;
+    color: var(--logo-red);
+  }
+  .auth-link.register:hover { color: #8b1a1a; }
+
+  /* SMS form (hidden by default) */
+  .sms-form {
+    display: none;
+  }
+  .sms-form.active {
+    display: flex;
+  }
+  .email-form.hidden {
+    display: none;
+  }
+
+  /* Error message */
+  .auth-error {
+    background: #fde8e8;
+    color: #c0392b;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+    text-align: center;
+  }
+  .auth-error.show { display: block; }
+
+  /* Success message */
+  .auth-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+    text-align: center;
+  }
+  .auth-success.show { display: block; }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .auth-modal {
+      padding: 28px 20px;
+      border-radius: 12px;
+    }
+    .auth-title { font-size: 18px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-modal">
+    
+    <!-- Close -->
+    <button class="auth-close" onclick="closeAuth()" aria-label="Закрыть">×</button>
+    
+    <!-- Title -->
+    <h2 class="auth-title">Авторизация</h2>
+    
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab" id="tabSms" onclick="switchTab('sms')">
+        <span class="radio-circle"></span>
+        По SMS
+      </button>
+      <button class="auth-tab active" id="tabEmail" onclick="switchTab('email')">
+        <span class="radio-circle"></span>
+        По e-mail
+      </button>
+    </div>
+    
+    <!-- Subtitle -->
+    <p class="auth-subtitle">Только для зарегистрированных пользователей</p>
+    
+    <!-- Error message -->
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-success" id="authSuccess"></div>
+    
+    <!-- Email Form -->
+    <form class="auth-form email-form" id="emailForm" method="POST" action="{% url 'foods:login' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.GET.next|default:'/' }}">
+      
+      <input type="email" 
+             name="email" 
+             class="auth-input" 
+             placeholder="Введите e-mail" 
+             required
+             autocomplete="email">
+      
+      <input type="password" 
+             name="password" 
+             class="auth-input" 
+             placeholder="Введите пароль" 
+             required
+             autocomplete="current-password">
+      
+      <button type="submit" class="auth-submit">Войти</button>
+    </form>
+    
+    <!-- SMS Form -->
+    <form class="auth-form sms-form" id="smsForm">
+      <input type="tel" 
+             name="phone" 
+             class="auth-input" 
+             placeholder="Введите номер телефона" 
+             autocomplete="tel">
+      
+      <input type="text" 
+             name="code" 
+             class="auth-input" 
+             placeholder="Введите код из SMS" 
+             maxlength="6"
+             style="display:none;">
+      
+      <button type="button" class="auth-submit" id="smsSubmitBtn" onclick="sendSmsCode()">
+        Получить код
+      </button>
+    </form>
+    
+    <!-- Divider -->
+    <div class="auth-divider">или продолжите с</div>
+    
+    <!-- Social Login -->
+    <div class="auth-socials">
+      <button class="auth-social-btn yandex" title="Яндекс" onclick="socialLogin('yandex')">Я</button>
+      <button class="auth-social-btn vk" title="ВКонтакте" onclick="socialLogin('vk')">VK</button>
+      <button class="auth-social-btn google" title="Google" onclick="socialLogin('google')">G</button>
+    </div>
+    
+    <!-- Bottom Links -->
+    <div class="auth-links">
+      <a href="#" class="auth-link register">Еще не зарегистрированы?</a>
+      <a href="#" class="auth-link">Забыли пароль?</a>
+    </div>
+    
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // ===== ПЕРЕКЛЮЧЕНИЕ ТАБОВ =====
+  function switchTab(tab) {
+    const tabSms = document.getElementById('tabSms');
+    const tabEmail = document.getElementById('tabEmail');
+    const smsForm = document.getElementById('smsForm');
+    const emailForm = document.getElementById('emailForm');
+    
+    if (tab === 'sms') {
+      tabSms.classList.add('active');
+      tabEmail.classList.remove('active');
+      smsForm.classList.add('active');
+      emailForm.classList.add('hidden');
+    } else {
+      tabEmail.classList.add('active');
+      tabSms.classList.remove('active');
+      emailForm.classList.remove('hidden');
+      smsForm.classList.remove('active');
+    }
+    
+    hideMessages();
+  }
+  
+  // ===== ЗАКРЫТИЕ АВТОРИЗАЦИИ =====
+  function closeAuth() {
+    document.getElementById('authOverlay').style.display = 'none';
+    // Переход на главную
+    window.location.href = '/';
+  }
+  
+  // Закрытие по клику на оверлей
+  document.getElementById('authOverlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeAuth();
+    }
+  });
+  
+  // Закрытие по Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeAuth();
+    }
+  });
+  
+  // ===== СООБЩЕНИЯ =====
+  function showError(msg) {
+    const el = document.getElementById('authError');
+    el.textContent = msg;
+    el.classList.add('show');
+    document.getElementById('authSuccess').classList.remove('show');
+  }
+  
+  function showSuccess(msg) {
+    const el = document.getElementById('authSuccess');
+    el.textContent = msg;
+    el.classList.add('show');
+    document.getElementById('authError').classList.remove('show');
+  }
+  
+  function hideMessages() {
+    document.getElementById('authError').classList.remove('show');
+    document.getElementById('authSuccess').classList.remove('show');
+  }
+  
+  // ===== ОТПРАВКА SMS КОДА =====
+  function sendSmsCode() {
+    const phone = document.querySelector('#smsForm input[name="phone"]').value;
+    const codeInput = document.querySelector('#smsForm input[name="code"]');
+    const btn = document.getElementById('smsSubmitBtn');
+    
+    if (!phone || phone.length < 10) {
+      showError('Введите корректный номер телефона');
+      return;
+    }
+    
+    // Имитация отправки SMS
+    btn.textContent = 'Отправляем...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+      btn.textContent = 'Подтвердить';
+      codeInput.style.display = 'block';
+      codeInput.focus();
+      showSuccess('Код отправлен на ' + phone);
+    }, 1500);
+  }
+  
+  // ===== СОЦИАЛЬНАЯ АВТОРИЗАЦИЯ =====
+  function socialLogin(provider) {
+    showError('Вход через ' + provider + ' пока недоступен');
+  }
+  
+  // ===== ПОКАЗ ОШИБОК СЕРВЕРА =====
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error' %}
+        showError('{{ message }}');
+      {% elif message.tags == 'success' %}
+        showSuccess('{{ message }}');
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  
+  // Показываем overlay при загрузке
+  document.getElementById('authOverlay').style.display = 'flex';
+</script>
+{% endblock %}

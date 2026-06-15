@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Личный кабинет — Blitz{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===== ЛИЧНЫЙ КАБИНЕТ ===== */
+  .profile-page {
+    padding: 40px 0 80px;
+    min-height: 60vh;
+  }
+  
+  .profile-breadcrumb {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .profile-breadcrumb a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .profile-breadcrumb a:hover {
+    color: var(--logo-red);
+  }
+  
+  .profile-title {
+    font-family: var(--font);
+    font-size: 32px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin-bottom: 32px;
+    letter-spacing: 1px;
+  }
+  
+  .profile-wrapper {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+  
+  /* ===== БОКОВАЯ ПАНЕЛЬ ===== */
+  .profile-sidebar {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 100px;
+  }
+  
+  .profile-user-info {
+    text-align: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--card-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: var(--font);
+  }
+  
+  .profile-name {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 4px;
+  }
+  
+  .profile-email {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  
+  .profile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .profile-menu-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .profile-menu-item:hover {
+    background: #f5f5f5;
+    color: var(--text-main);
+  }
+  .profile-menu-item.active {
+    background: var(--logo-red);
+    color: #fff;
+  }
+  
+  /* ===== ОСНОВНОЙ КОНТЕНТ ===== */
+  .profile-content {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .profile-section-title {
+    font-family: var(--font);
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--logo-red);
+  }
+  
+  /* ===== ИСТОРИЯ ЗАКАЗОВ ===== */
+  .orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .order-card {
+    background: #faf9f7;
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+  }
+  .order-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+  
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .order-info h3 {
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin-bottom: 8px;
+  }
+  
+  .order-date {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  
+  .order-number {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  
+  .order-status {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .order-status.delivered { background: #d4edda; color: #155724; }
+  .order-status.processing { background: #fff3cd; color: #856404; }
+  .order-status.shipped { background: #d1ecf1; color: #0c5460; }
+  .order-status.cancelled { background: #f8d7da; color: #721c24; }
+  
+  .order-items { margin-bottom: 20px; }
+  
+  .order-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .order-item:last-child { border-bottom: none; }
+  
+  .order-item-img {
+    width: 60px;
+    height: 60px;
+    background: var(--card-green);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .order-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  .order-item-info { flex: 1; }
+  
+  .order-item-name {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 4px;
+  }
+  
+  .order-item-qty {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  
+  .order-item-price {
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  
+  .order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+  
+  .order-address {
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 60%;
+  }
+  
+  .order-total {
+    font-family: var(--font);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+  }
+  
+  /* Пустой список */
+  .orders-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .orders-empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+  .orders-empty h3 {
+    font-family: var(--font);
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--text-main);
+  }
+  
+  /* Адаптив */
+  @media (max-width: 900px) {
+    .profile-wrapper { grid-template-columns: 1fr; }
+    .profile-sidebar { position: static; }
+    .order-header { flex-direction: column; gap: 12px; }
+    .order-footer { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .order-address { max-width: 100%; }
+  }
+  
+  @media (max-width: 600px) {
+    .order-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .order-item-img { width: 80px; height: 80px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container profile-page">
+  
+  <!-- Breadcrumb -->
+  <nav class="profile-breadcrumb">
+    <a href="{% url 'foods:home' %}">Главная</a> 
+    <span> › </span>
+    <span>Личный кабинет</span>
+  </nav>
+  
+  <!-- Title -->
+  <h1 class="profile-title">ИСТОРИЯ ЗАКАЗОВ</h1>
+  
+  <div class="profile-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="profile-sidebar">
+      <div class="profile-user-info">
+        <div class="profile-avatar">{{ user.username|first|upper }}</div>
+        <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+        <div class="profile-email">{{ user.email }}</div>
+      </div>
+      
+      <nav class="profile-menu">
+        <a href="{% url 'foods:profile' %}" class="profile-menu-item active">
+          <span></span> История заказов
+        </a>
+        <a href="{% url 'foods:logout' %}" class="profile-menu-item">
+          <span>🚪</span> Выйти
+        </a>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="profile-content">
+      <h2 class="profile-section-title">История заказов</h2>
+      
+      {% if orders %}
+      <div class="orders-list">
+        {% for order in orders %}
+        <div class="order-card">
+          
+          <!-- Header -->
+          <div class="order-header">
+            <div class="order-info">
+              <h3>Заказ от {{ order.created_at|date:"d E Y" }}</h3>
+              <div class="order-date">{{ order.created_at|date:"d E Y" }}</div>
+              <div class="order-number">№ {{ order.id }}</div>
+            </div>
+            <!-- ✅ Исправлено: корректная привязка CSS-класса к ключу статуса -->
+            <span class="order-status {% if order.status == 'delivered' %}delivered{% elif order.status == 'shipped' %}shipped{% elif order.status == 'pending' %}processing{% else %}cancelled{% endif %}">
+              {{ order.get_status_display }}
+            </span>
+          </div>
+          
+          <!-- Items -->
+          <div class="order-items">
+            {% for item in order.items.all %}
+            <div class="order-item">
+              <div class="order-item-img">
+                {% if item.product.image %}
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                {% else %}
+                  <img src="{% static 'img/corm.png' %}" alt="Нет фото">
+                {% endif %}
+              </div>
+              <div class="order-item-info">
+                <!-- ✅ Исправлено: доступ к названию товара через связь product -->
+                <div class="order-item-name">{{ item.product.name }}</div>
+                <div class="order-item-qty">{{ item.quantity }} шт.</div>
+              </div>
+              <div class="order-item-price">{{ item.price }} ₽</div>
+            </div>
+            {% endfor %}
+          </div>
+          
+          <!-- Footer -->
+          <div class="order-footer">
+            <div class="order-address">
+              <strong>Адрес доставки:</strong> {{ order.address }}
+            </div>
+            <div class="order-total">{{ order.total|floatformat:0 }} ₽</div>
+          </div>
+          
+        </div>
+        {% endfor %}
+      </div>
+      
+      {% else %}
+      <!-- Empty state -->
+      <div class="orders-empty">
+        <div class="orders-empty-icon">📦</div>
+        <h3>У вас пока нет заказов</h3>
+        <p>Перейдите в каталог, чтобы сделать первый заказ</p>
+        <a href="{% url 'foods:catalog' %}" style="display: inline-flex; align-items: center; gap: 8px; background: var(--btn-green); color: var(--text-main); padding: 12px 24px; border-radius: var(--radius); font-family: var(--font); font-weight: 700; font-size: 13px; text-transform: uppercase; text-decoration: none; margin-top: 16px; transition: all 0.2s;">
+          Перейти в каталог →
+        </a>
+      </div>
+      {% endif %}
+      
+    </main>
+  </div>
+  
+</div>
+{% endblock %}

@@ -1,0 +1,959 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}О бренде — Blitz{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===== BREADCRUMB ===== */
+  .breadcrumb {
+    padding: 16px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+  }
+  .breadcrumb a { color: var(--text-muted); transition: color .3s; }
+  .breadcrumb a:hover { color: var(--logo-red); }
+  .breadcrumb span { margin: 0 8px; color: #999; }
+
+  /* ===== HERO IMAGE ===== */
+  .hero-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    margin-bottom: 60px;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+
+  /* ===== SECTION COMMON ===== */
+  .section { padding: 0 0 70px; }
+  .section-title {
+    font-family: var(--font);
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== WHAT IS BLITZ ===== */
+  .blitz-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .blitz-card {
+    background: #fff;
+    padding: 24px;
+    border-radius: var(--radius);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .blitz-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  .blitz-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--logo-red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 24px;
+  }
+  .blitz-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+  }
+
+  /* ===== PHILOSOPHY ===== */
+  .philosophy-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .philosophy-img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    border-radius: 16px;
+    background: var(--card-green);
+  }
+  .philosophy-text p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.7;
+    font-family: var(--font-body);
+  }
+
+  /* ===== ADVANTAGES ===== */
+  .advantages-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .advantages-text p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.7;
+    font-family: var(--font-body);
+  }
+  .advantages-img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 16px;
+    background: var(--card-green);
+  }
+
+  /* ===== PRODUCTION — ЧЕРЕДОВАНИЕ ===== */
+  .production-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    margin-bottom: 48px;
+  }
+  .production-block .prod-img-wrap { grid-column: 1; }
+  .production-block .prod-text-wrap { grid-column: 2; }
+  .production-block.reverse .prod-img-wrap { grid-column: 2; }
+  .production-block.reverse .prod-text-wrap { grid-column: 1; }
+
+  .production-img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 16px;
+    background: var(--card-green);
+  }
+  .production-text p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.7;
+    font-family: var(--font-body);
+  }
+  .production-subtitle {
+    font-family: var(--font);
+    font-size: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 48px 0 32px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* ===== NEWS ===== */
+  .news-scroll {
+    display: flex;
+    gap: 16px;
+    position: relative;
+    margin-bottom: 32px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 10px;
+  }
+  .news-scroll::-webkit-scrollbar { display: none; }
+  .news-card {
+    min-width: 340px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  .news-card-img {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+  }
+  .news-card-img.green { background: var(--card-green); }
+  .news-card-img.photo { background: #d4c9b8; }
+  .news-card-body { padding: 20px; }
+  .news-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .news-tag {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    color: #666;
+    font-weight: 500;
+    background: #f8f8f8;
+  }
+  .news-card-date {
+    font-size: 11px;
+    color: #999;
+    margin-bottom: 6px;
+    font-family: var(--font-body);
+  }
+  .news-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.4;
+    font-family: var(--font-body);
+  }
+  .btn-all-news {
+    display: block;
+    width: 240px;
+    margin: 0 auto;
+    padding: 14px 28px;
+    background: var(--text-main);
+    color: #fff;
+    text-align: center;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    transition: background .3s;
+  }
+  .btn-all-news:hover { background: #444; }  /* ===== НОВОСТИ ===== */
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .news-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  .news-card-img {
+    height: 240px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-green);
+  }
+  .news-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+  .news-card:hover .news-card-img img { transform: scale(1.05); }
+  .news-card-body { padding: 20px; }
+  .news-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .news-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    color: #666;
+    font-weight: 500;
+    background: #f8f8f8;
+  }
+  .news-card-date {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+  }
+  .news-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.4;
+  }
+
+
+  /* ===== WHOLESALE ===== */
+  .wholesale-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .wholesale-title {
+    font-family: var(--font);
+    font-size: 28px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-main);
+  }
+  .wholesale-catalog {
+    font-family: var(--font);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--card-green);
+    text-transform: uppercase;
+    
+    padding: 4px 12px;
+    border-radius: 4px;
+  }
+
+  /* Исходное состояние: картинка + текст */
+  .wholesale-default {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    animation: fadeIn 0.4s ease;
+  }
+  .wholesale-img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 16px;
+    background: var(--card-green);
+  }
+  .wholesale-text p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.7;
+    font-family: var(--font-body);
+  }
+  .btn-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--text-main);
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    transition: background .3s;
+    gap: 8px;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-more:hover { background: #444; }
+
+  /* Состояние после нажатия: 4 карточки */
+  .wholesale-products {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .wholesale-products.active {
+    display: block;
+  }
+  .wholesale-default.hidden {
+    display: none;
+  }
+
+  .products-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .feed-product-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .feed-product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  .feed-product-card .wishlist-icon {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 18px;
+    color: #d1d1d1;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .feed-product-card .wishlist-icon:hover {
+    color: var(--logo-red);
+  }
+  .feed-product-img {
+    width: 100%;
+    height: 180px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .feed-product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
+  }
+  .feed-product-title {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 50px;
+  }
+  .feed-product-weight {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .feed-product-price {
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 16px;
+  }
+  .feed-product-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .btn-feed-cart {
+    width: 100%;
+    background: var(--text-main);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-feed-cart:hover { background: #333; }
+  .btn-feed-oneclick {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 11px;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-family: var(--font-body);
+  }
+  .btn-feed-oneclick:hover { color: var(--text-main); }
+
+  .wholesale-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .btn-to-catalog {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--text-main);
+    color: #fff;
+    padding: 14px 40px;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    transition: background .3s;
+    text-decoration: none;
+    gap: 8px;
+  }
+  .btn-to-catalog:hover { background: #444; }
+  .btn-back-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--text-muted);
+    padding: 14px 32px;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid var(--border);
+  }
+  .btn-back-info:hover {
+    background: var(--bg-page);
+    color: var(--text-main);
+  }
+
+  /* ===== CTA ===== */
+  .cta {
+    background: var(--card-green);
+    padding: 50px 0;
+    margin-top: 20px;
+  }
+  .cta-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .cta-text {
+    font-family: var(--font);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-main);
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+  .cta-text span {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    text-transform: none;
+    margin-top: 4px;
+    color: var(--text-muted);
+  }
+  .btn-question {
+    background: var(--text-main);
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    transition: background .3s;
+  }
+  .btn-question:hover { background: #444; }
+
+  /* ===== ANIMATION ===== */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .blitz-grid,
+    .philosophy-inner,
+    .advantages-inner,
+    .production-block,
+    .wholesale-default {
+      grid-template-columns: 1fr;
+    }
+    .production-block .prod-img-wrap,
+    .production-block.reverse .prod-img-wrap,
+    .production-block .prod-text-wrap,
+    .production-block.reverse .prod-text-wrap {
+      grid-column: 1;
+    }
+    .news-card { min-width: 280px; }
+    .wholesale-header { flex-direction: column; align-items: flex-start; }
+    .products-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .products-row { grid-template-columns: 1fr; }
+    .cta-inner { flex-direction: column; text-align: center; gap: 20px; }
+    .section-title { font-size: 24px; }
+    .news-scroll { gap: 12px; }
+    .news-card { min-width: 260px; }
+    .wholesale-actions { flex-direction: column; }
+    .btn-to-catalog, .btn-back-info { width: 100%; }
+  }
+  @media (max-width: 400px) {
+    .section-title { font-size: 20px; }
+  }
+  /* ===== Исправление для контейнеров с картинками ===== */
+.production-img,
+.wholesale-img,
+.news-card-img {
+  background-color: transparent !important; /* Убираем цветной фон, если он мешает */
+  position: relative;
+  overflow: hidden; /* Обрезаем, если картинка вылезает за границы */
+}
+
+.production-img img,
+.wholesale-img img,
+.news-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Картинка заполняет блок, сохраняя пропорции */
+  display: block;
+  border-radius: inherit; /* Наследует скругление углов от родителя */
+}
+
+/* Специфика для новостей, чтобы картинка была ровно в карточке */
+.news-card-img {
+  height: 200px; /* Фиксируем высоту, как у вас было */
+  background-color: var(--card-green); /* Фон пока грузится картинка */
+}
+/* ===== ГЛОБАЛЬНЫЙ ФИКС ДЛЯ ВСЕХ ИЗОБРАЖЕНИЙ ===== */
+/* Убираем цветной фон и скругляем углы */
+.philosophy-img,
+.advantages-img,
+.production-img,
+.wholesale-img,
+.news-card-img {
+  background-color: transparent !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+/* Заставляем картинки заполнять контейнер без искажений */
+.philosophy-img img,
+.advantages-img img,
+.production-img img,
+.wholesale-img img,
+.news-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Растягивает и обрезает лишнее, сохраняя пропорции */
+  display: block;
+}
+
+/* Фиксируем высоту, чтобы верстка не "поехала" */
+.philosophy-img { height: 320px; }
+.advantages-img   { height: 280px; }
+.production-img   { height: 280px; }
+.wholesale-img    { height: 280px; }
+.news-card-img    { height: 200px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ========== BREADCRUMB ========== -->
+<div class="container">
+  <div class="breadcrumb">
+    <a href="/">Главная</a>
+    <span>›</span>
+    <span>О бренде</span>
+  </div>
+</div>
+
+<!-- ========== HERO IMAGE ========== -->
+<img src="{% static 'img/brand5.png' %}" alt="Dog and cat" class="hero-image">
+
+<!-- ========== WHAT IS BLITZ ========== -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Что такое Blitz?</h2>
+    <div class="blitz-grid">
+      <div class="blitz-card">
+        <div class="blitz-icon"><img src="{% static 'img/brend5.png' %}"></div>
+        <p class="blitz-text">BLITZ — это сухие и влажные корма для собак и кошек, выдающееся предложение на российском рынке.</p>
+      </div>
+      <div class="blitz-card">
+        <div class="blitz-icon"><img src="{% static 'img/Group 79.png' %}"></div>
+        <p class="blitz-text">BLITZ — это продукт отечественного производства, соответствующий по своему качеству зарубежным кормам суперпремиум-класса.</p>
+      </div>
+      <div class="blitz-card">
+        <div class="blitz-icon"><img src="{% static 'img/brend6.png' %}"></div>
+        <p class="blitz-text">BLITZ — это полноценный рацион, удовлетворяющий все потребности животных в здоровом питании.</p>
+      </div>
+      <div class="blitz-card">
+        <div class="blitz-icon"><img src="{% static 'img/brend7.png' %}"></div>
+        <p class="blitz-text">BLITZ — это первый российский корм, обогащённый живыми бактериями-пробиотиками.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== PHILOSOPHY ========== -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Философия бренда</h2>
+    <div class="philosophy-inner">
+      <div class="philosophy-img"><img src="{% static 'img/image 74.png' %}"></div>
+      <div class="philosophy-text">
+        <p>Как принято считать, акционеры крупнейших компаний представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть указаны как претенденты на роль ключевых.</p>
+        <p>Как принято считать, акционеры крупнейших компаний представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть указаны как претенденты на роль ключевых.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ADVANTAGES ========== -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Наши преимущества</h2>
+    <div class="advantages-inner">
+      <div class="advantages-text">
+        <p>Как принято считать, акционеры крупнейших компаний представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть указаны как претенденты на роль ключевых.</p>
+        <p>Как принято считать, акционеры крупнейших компаний представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть указаны как претенденты на роль ключевых.</p>
+      </div>
+      <div class="advantages-img"><img src="{% static 'img/zerno.png' %}"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== PRODUCTION ========== -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Производство</h2>
+
+    <!-- Блок 1: картинка слева, текст справа -->
+    <div class="production-block">
+      <div class="prod-img-wrap">
+        <div class="production-img"><img src="{% static 'img/brend1.png' %}"></div>
+      </div>
+      <div class="prod-text-wrap">
+        <div class="production-text">
+          <p>Идея выпуска отечественных кормов для собак и кошек сегмента суперпремиум зародилась у нас неслучайно, ей предшествовало изучение современных технологий производства и тщательный мониторинг рынка. В 2013 году, после консультаций со специалистами и разработки рецептур, мы подошли к созданию собственного продукта, который смог конкурировать с зарубежными марками кормов по качеству состава и при этом выигрывал в стоимости. Добиться этого нам помогла грамотная логистика, отказ от посреднических услуг и полный контроль за процессом выпуска кормов на всех этапах — от выбора поставщиков и закупки сырья до транспортировки готового товара с производственных площадок на склады Blitz.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Блок 2: текст слева, картинка справа (reverse) -->
+    <div class="production-block reverse">
+      <div class="prod-text-wrap">
+        <div class="production-text">
+          <p>Линейки сухих кормов Blitz Sensitive и Blitz Classic мы изготавливаем на заводе Provimi Petfood Rus, который входит в международный холдинг Cargill. Один из немногих в России, он оснащён компьютеризированным оборудованием Wenger и Van Aarsen, которое обеспечивает стабильность качества выпускаемых продуктов. Завод расположен в Клину и лидирует на рынке более 16 лет, имея положительную репутацию.</p>
+        </div>
+      </div>
+      <div class="prod-img-wrap">
+        <div class="production-img"><img src="{% static 'img/brend2.png' %}"></div>
+      </div>
+    </div>
+
+    <h3 class="production-subtitle">Современное производство обеспечивает высокое качество кормов и привлекательную цену</h3>
+
+    <!-- Блок 3: картинка слева, текст справа -->
+    <div class="production-block">
+      <div class="prod-img-wrap">
+        <div class="production-img"><img src="{% static 'img/brend3.png' %}"></div>
+      </div>
+      <div class="prod-text-wrap">
+        <div class="production-text">
+          <p>Производство полнорационных консервированных кормов Blitz стало следующим шагом в развитии компании, мы к нему тщательно готовились и в 2019 году смогли порадовать наших потребителей собственными влажными линейками — Blitz Classic, Blitz Sensitive и Blitz Holistic. Они производятся в Дмитрове на ультрасовременном заводе «ПетКорм» (запущен в 2018 г.), чьи производственные мощности занимают более 10 тысяч квадратных метров и включают итальянское, датское и немецкое оборудование. В отладке процесса производства принимали участие как отечественные, так и зарубежные специалисты.</p>
+          <p>Мы гордимся составом наших кормов, современными технологиями их производства и высокой ответственностью наших партнёров! Корма Blitz — это взвешенный выбор, основанный на доверии!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== НОВОСТИ ========== -->
+<section class="section" id="news">
+  <div class="container">
+    <h2 class="section-title">Наши новости</h2>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-card-img"><img src="{% static 'img/cat.png' %}" alt="Собака на прогулке"></div>
+        <div class="news-card-body">
+          <div class="news-tags">
+            <span class="news-tag">Воспитание и дрессировка</span>
+            <span class="news-tag">Питание</span>
+            <span class="news-tag">Здоровье</span>
+          </div>
+          <div class="news-card-date">05 дек 2024</div>
+          <div class="news-card-title">Очень длинное название периодического материала из нескольких строк</div>
+        </div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-img"><img src="{% static 'img/cat.png' %}" alt="Две собаки играют"></div>
+        <div class="news-card-body">
+          <div class="news-tags">
+            <span class="news-tag">Питание</span>
+            <span class="news-tag">Содержание животных</span>
+          </div>
+          <div class="news-card-date">12 дек 2024</div>
+          <div class="news-card-title">Очень длинное название периодического материала из нескольких строк</div>
+        </div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-img"><img src="{% static 'img/cat.png' %}" alt="Здоровый питомец"></div>
+        <div class="news-card-body">
+          <div class="news-tags">
+            <span class="news-tag">Здоровье</span>
+            <span class="news-tag">Ветеринария</span>
+          </div>
+          <div class="news-card-date">20 дек 2024</div>
+          <div class="news-card-title">Очень длинное название периодического материала из нескольких строк</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== WHOLESALE — с переключением ========== -->
+<section class="section" id="wholesale">
+  <div class="container">
+    <div class="wholesale-header">
+      <h2 class="wholesale-title">Оптовым покупателям</h2>
+      <span class="wholesale-catalog">КАТАЛОГ</span>
+    </div>
+
+    <!-- Исходное состояние: картинка + текст -->
+    <div class="wholesale-default" id="wholesaleDefault">
+      <div class="wholesale-img"><img src="{% static 'img/brend4.png' %}"></div>
+      <div class="wholesale-text">
+        <p>Как принято считать, акционеры крупнейших компаний представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть указаны как претенденты на роль ключевых.</p>
+        <p>Как принято считать, акционеры крупнейших компаний представляют собой не что иное, как квинтэссенцию победы маркетинга над разумом и должны быть указаны как претенденты на роль ключевых.</p>
+        <button class="btn-more" onclick="showProducts()">Подробнее ›</button>
+      </div>
+    </div>
+
+    <!-- Состояние после нажатия: 4 карточки -->
+    <div class="wholesale-products" id="wholesaleProducts">
+      <div class="products-row">
+        <!-- Карточка 1 -->
+        <div class="feed-product-card">
+          <span class="wishlist-icon"></span>
+          <div class="feed-product-img">
+            <img src="{% static 'img/corm.png' %}" alt="Blitz Sensitive" 
+                 onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-size:60px>🐕</span>'">
+          </div>
+          <div class="feed-product-title">Blitz Sensitive с ягнёнком и рисом сухой корм для взрослых собак</div>
+          <div class="feed-product-weight">Вес: 1.5 кг</div>
+          <div class="feed-product-price"></div>
+          <div class="feed-product-actions">
+          
+        
+          </div>
+        </div>
+        <!-- Карточка 2 -->
+        <div class="feed-product-card">
+          <span class="wishlist-icon"></span>
+          <div class="feed-product-img">
+            <img src="{% static 'img/corm.png' %}" alt="Blitz Classic"
+                 onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-size:60px>🐕</span>'">
+          </div>
+          <div class="feed-product-title">Blitz Classic с курицей и рисом для собак мелких пород</div>
+          <div class="feed-product-weight">Вес: 2 кг</div>
+          <div class="feed-product-price"></div>
+          <div class="feed-product-actions">
+     
+       
+          </div>
+        </div>
+        <!-- Карточка 3 -->
+        <div class="feed-product-card">
+          <span class="wishlist-icon"></span>
+          <div class="feed-product-img">
+            <img src="{% static 'img/corm.png' %}" alt="Blitz Holistic"
+                 onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-size:60px>🐱</span>'">
+          </div>
+          <div class="feed-product-title">Blitz Holistic с лососем для кошек стерилизованных</div>
+          <div class="feed-product-weight">Вес: 1.5 кг</div>
+          <div class="feed-product-price"></div>
+          <div class="feed-product-actions">
+   
+        
+          </div>
+        </div>
+        <!-- Карточка 4 -->
+        <div class="feed-product-card">
+          <span class="wishlist-icon"></span>
+          <div class="feed-product-img">
+            <img src="{% static 'img/corm.png' %}" alt="Blitz Optimal"
+                 onerror="this.style.display='none';this.parentElement.innerHTML='<span style=font-size:60px>🐱</span>'">
+          </div>
+          <div class="feed-product-title">Blitz Optimal с индейкой для кошек активных пород</div>
+          <div class="feed-product-weight">Вес: 1.5 кг</div>
+          <div class="feed-product-price"></div>
+          <div class="feed-product-actions">
+
+          </div>
+        </div>
+      </div>
+
+      <div class="wholesale-actions">
+        <a href="{% url 'foods:catalog' %}" class="btn-to-catalog">В каталог <span>→</span></a>
+        <button class="btn-back-info" onclick="hideProducts()">← Вернуться</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== CTA ========== -->
+<section class="cta">
+  <div class="container">
+    <div class="cta-inner">
+      <div class="cta-text">
+        Появились вопросы?<br>
+        <span>Свяжитесь с нами</span>
+      </div>
+      <a href="#" class="btn-question">Задать вопрос</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function showProducts() {
+    document.getElementById('wholesaleDefault').classList.add('hidden');
+    document.getElementById('wholesaleProducts').classList.add('active');
+    
+    setTimeout(() => {
+      document.getElementById('wholesale').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }, 100);
+  }
+
+  function hideProducts() {
+    document.getElementById('wholesaleDefault').classList.remove('hidden');
+    document.getElementById('wholesaleProducts').classList.remove('active');
+    
+    setTimeout(() => {
+      document.getElementById('wholesale').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }, 100);
+  }
+
+
+</script>
+{% endblock %}

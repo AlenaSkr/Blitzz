@@ -1,0 +1,594 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Регистрация — Blitz{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ===== AUTH OVERLAY ===== */
+  .auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ===== AUTH MODAL ===== */
+  .auth-modal {
+    background: #f5f2eb;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+    animation: modalSlideIn 0.3s ease;
+  }
+
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Close button */
+  .auth-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+  .auth-close:hover { color: var(--text-main); }
+
+  /* Title */
+  .auth-title {
+    font-family: var(--font);
+    font-size: 22px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-main);
+    text-align: center;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+  }
+
+  /* Subtitle */
+  .auth-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* Form */
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .auth-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    background: #fff;
+    color: var(--text-main);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .auth-input:focus {
+    outline: none;
+    border-color: var(--btn-green);
+    box-shadow: 0 0 0 3px rgba(168, 201, 108, 0.2);
+  }
+  .auth-input::placeholder {
+    color: #bbb;
+  }
+
+  /* Password field with toggle */
+  .password-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  .password-wrapper .auth-input {
+    padding-right: 44px;
+  }
+  .password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 18px;
+    padding: 4px;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+  .password-toggle:hover { color: var(--text-main); }
+
+  /* Password strength indicator */
+  .password-strength {
+    display: flex;
+    gap: 4px;
+    margin-top: -4px;
+    margin-bottom: 4px;
+  }
+  .strength-bar {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: #ddd;
+    transition: background 0.3s;
+  }
+  .strength-bar.weak { background: #e74c3c; }
+  .strength-bar.medium { background: #f39c12; }
+  .strength-bar.strong { background: #27ae60; }
+  .strength-text {
+    font-size: 11px;
+    margin-top: 4px;
+    margin-bottom: -4px;
+    color: var(--text-muted);
+  }
+
+  /* Register button */
+  .auth-submit {
+    width: 100%;
+    padding: 14px;
+    background: #c5d8a8;
+    color: var(--text-main);
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 24px;
+  }
+  .auth-submit:hover {
+    background: #b2c896;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .auth-submit:active {
+    transform: translateY(0);
+  }
+  .auth-submit:disabled {
+    background: #ddd;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Divider */
+  .auth-divider {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .auth-divider::before,
+  .auth-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 70px);
+    height: 1px;
+    background: #ddd;
+  }
+  .auth-divider::before { left: 0; }
+  .auth-divider::after { right: 0; }
+
+  /* Social buttons */
+  .auth-socials {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .auth-social-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .auth-social-btn.yandex { background: #FC3F1D; }
+  .auth-social-btn.vk { background: #0077FF; }
+  .auth-social-btn.google { background: #4285F4; }
+  .auth-social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  /* Bottom links */
+  .auth-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .auth-link {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .auth-link:hover { color: var(--text-main); }
+  .auth-link.login-link {
+    font-weight: 600;
+    color: var(--logo-red);
+  }
+  .auth-link.login-link:hover { color: #8b1a1a; }
+
+  /* Error/Success messages */
+  .auth-error {
+    background: #fde8e8;
+    color: #c0392b;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+    text-align: center;
+  }
+  .auth-error.show { display: block; }
+
+  .auth-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+    text-align: center;
+  }
+  .auth-success.show { display: block; }
+
+  /* Checkbox */
+  .auth-checkbox-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .auth-checkbox-wrapper input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--btn-green);
+    margin-top: 2px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .auth-checkbox-wrapper label {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    cursor: pointer;
+  }
+  .auth-checkbox-wrapper label a {
+    color: var(--logo-red);
+    text-decoration: underline;
+  }
+
+  /* Loading spinner */
+  .auth-submit .spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 8px;
+  }
+  .auth-submit.loading .spinner { display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .auth-modal {
+      padding: 28px 20px;
+      border-radius: 12px;
+    }
+    .auth-title { font-size: 18px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-modal">
+    
+    <!-- Close -->
+    <button class="auth-close" onclick="closeRegister()" aria-label="Закрыть">×</button>
+    
+    <!-- Title -->
+    <h2 class="auth-title">Регистрация</h2>
+    
+    <!-- Subtitle -->
+    <p class="auth-subtitle">Создайте аккаунт для доступа ко всем функциям</p>
+    
+    <!-- Error message -->
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-success" id="authSuccess"></div>
+    
+    <!-- Register Form -->
+    <form class="auth-form" id="registerForm" method="POST" action="{% url 'foods:register' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.GET.next|default:'/' }}">
+      
+      <!-- Name -->
+      <input type="text" 
+             name="username" 
+             id="regName"
+             class="auth-input" 
+             placeholder="Введите имя" 
+             required
+             minlength="2"
+             autocomplete="name">
+      
+      <!-- Email -->
+      <input type="email" 
+             name="email" 
+             id="regEmail"
+             class="auth-input" 
+             placeholder="Введите e-mail" 
+             required
+             autocomplete="email">
+      
+      <!-- Password -->
+      <div class="password-wrapper">
+        <input type="password" 
+               name="password" 
+               id="regPassword"
+               class="auth-input" 
+               placeholder="Введите пароль" 
+               required
+               minlength="6"
+               autocomplete="new-password"
+               oninput="checkPasswordStrength()">
+        <button type="button" class="password-toggle" onclick="togglePassword('regPassword', this)">👁</button>
+      </div>
+      
+      <!-- Password strength -->
+      <div class="password-strength" id="strengthBars">
+        <div class="strength-bar" id="bar1"></div>
+        <div class="strength-bar" id="bar2"></div>
+        <div class="strength-bar" id="bar3"></div>
+        <div class="strength-bar" id="bar4"></div>
+      </div>
+      <div class="strength-text" id="strengthText"></div>
+      
+      <!-- Confirm Password -->
+      <div class="password-wrapper">
+        <input type="password" 
+               name="password2" 
+               id="regPassword2"
+               class="auth-input" 
+               placeholder="Повторите пароль" 
+               required
+               minlength="6"
+               autocomplete="new-password">
+        <button type="button" class="password-toggle" onclick="togglePassword('regPassword2', this)">👁</button>
+      </div>
+      
+      <!-- Terms checkbox -->
+      <div class="auth-checkbox-wrapper">
+        <input type="checkbox" id="agreeTerms" required>
+        <label for="agreeTerms">
+          Я соглашаюсь с <a href="#">условиями использования</a> и 
+          <a href="#">политикой конфиденциальности</a>
+        </label>
+      </div>
+      
+      <!-- Submit -->
+      <button type="submit" class="auth-submit" id="submitBtn">
+        <span class="spinner"></span>
+        Зарегистрироваться
+      </button>
+    </form>
+    
+    <!-- Divider -->
+    <div class="auth-divider">или продолжите с</div>
+    
+    <!-- Social Login -->
+    <div class="auth-socials">
+      <button class="auth-social-btn yandex" title="Яндекс" onclick="socialLogin('yandex')">Я</button>
+      <button class="auth-social-btn vk" title="ВКонтакте" onclick="socialLogin('vk')">VK</button>
+      <button class="auth-social-btn google" title="Google" onclick="socialLogin('google')">G</button>
+    </div>
+    
+    <!-- Bottom Links -->
+    <div class="auth-links">
+      <a href="{% url 'foods:auth' %}"" class="auth-link login-link">Уже есть аккаунт? Войти</a>
+    </div>
+    
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // ===== ЗАКРЫТИЕ =====
+  function closeRegister() {
+    document.getElementById('authOverlay').style.display = 'none';
+    window.location.href = '/';
+  }
+  
+  document.getElementById('authOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeRegister();
+  });
+  
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeRegister();
+  });
+  
+  // ===== СООБЩЕНИЯ =====
+  function showError(msg) {
+    const el = document.getElementById('authError');
+    el.textContent = msg;
+    el.classList.add('show');
+    document.getElementById('authSuccess').classList.remove('show');
+  }
+  
+  function showSuccess(msg) {
+    const el = document.getElementById('authSuccess');
+    el.textContent = msg;
+    el.classList.add('show');
+    document.getElementById('authError').classList.remove('show');
+  }
+  
+  // ===== ПОКАЗАТЬ/СКРЫТЬ ПАРОЛЬ =====
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁';
+    }
+  }
+  
+  // ===== ПРОВЕРКА СИЛЫ ПАРОЛЯ =====
+  function checkPasswordStrength() {
+    const password = document.getElementById('regPassword').value;
+    const bars = [
+      document.getElementById('bar1'),
+      document.getElementById('bar2'),
+      document.getElementById('bar3'),
+      document.getElementById('bar4')
+    ];
+    const strengthText = document.getElementById('strengthText');
+    
+    // Сброс
+    bars.forEach(bar => bar.className = 'strength-bar');
+    strengthText.textContent = '';
+    
+    if (password.length === 0) return;
+    
+    let score = 0;
+    
+    // Длина
+    if (password.length >= 6) score++;
+    if (password.length >= 10) score++;
+    
+    // Сложность
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    
+    let level, text, color;
+    
+    if (score <= 1) {
+      level = 1;
+      text = 'Слабый пароль';
+      color = 'weak';
+    } else if (score <= 2) {
+      level = 2;
+      text = 'Средний пароль';
+      color = 'medium';
+    } else if (score <= 3) {
+      level = 3;
+      text = 'Хороший пароль';
+      color = 'medium';
+    } else {
+      level = 4;
+      text = 'Надёжный пароль';
+      color = 'strong';
+    }
+    
+    for (let i = 0; i < level; i++) {
+      bars[i].classList.add(color);
+    }
+    
+    strengthText.textContent = text;
+    strengthText.style.color = color === 'weak' ? '#e74c3c' : color === 'medium' ? '#f39c12' : '#27ae60';
+  }
+  
+  // ===== ВАЛИДАЦИЯ ФОРМЫ =====
+  document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const password = document.getElementById('regPassword').value;
+    const password2 = document.getElementById('regPassword2').value;
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    
+    if (name.length < 2) {
+      e.preventDefault();
+      showError('Имя должно содержать минимум 2 символа');
+      return;
+    }
+    
+    if (password.length < 6) {
+      e.preventDefault();
+      showError('Пароль должен быть не менее 6 символов');
+      return;
+    }
+    
+    if (password !== password2) {
+      e.preventDefault();
+      showError('Пароли не совпадают');
+      return;
+    }
+    
+    // Показываем загрузку
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+  });
+  
+  // ===== СОЦИАЛЬНАЯ АВТОРИЗАЦИЯ =====
+  function socialLogin(provider) {
+    showError('Вход через ' + provider + ' пока недоступен');
+  }
+  
+  // ===== СЕРВЕРНЫЕ ОШИБКИ =====
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'error' %}
+        showError('{{ message }}');
+      {% elif message.tags == 'success' %}
+        showSuccess('{{ message }}');
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+  
+  // Показываем overlay
+  document.getElementById('authOverlay').style.display = 'flex';
+</script>
+{% endblock %}
