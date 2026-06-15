@@ -44,7 +44,7 @@ ________________________________________________________________________________
 <img width="873" height="743" alt="image" src="https://github.com/user-attachments/assets/5a5a11c2-cdda-4ad7-9705-5506f8c9d55d" />
 
 Страница Бренд
-<img width="1282" height="893" alt="image" src="https://github.com/user-attachments/assets/1675feb3-a917-4084-9ee6-f62ad41803b9" 
+<img width="1282" height="893" alt="image" src="https://github.com/user-attachments/assets/1675feb3-a917-4084-9ee6-f62ad41803b9" />
 <img width="1218" height="460" alt="image" src="https://github.com/user-attachments/assets/142ad9ce-f296-4ef7-bd32-50a3be4447a9" />
 
 Страница ветеринарной линейки
