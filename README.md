@@ -1,4 +1,4 @@
-## 🐻 Блитц (Blitz)
+## 🐶 Блитц (Blitz)
 **Блитц (Blitz)** — интернет-магазин по продаже корма для собак и кошек.
 !<img width="481" height="174" alt="image" src="https://github.com/user-attachments/assets/4abd3858-251b-4433-b759-187f23388e03" />
 
